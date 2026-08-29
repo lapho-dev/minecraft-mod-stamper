@@ -56,7 +56,14 @@ public final class StamperNeoForge {
                     () -> new BlockEntityType<>(
                             (pos, state) -> StamperContent.createBlockEntity(
                                     StamperNeoForge.STAMPER_BLOCK_ENTITY, pos, state),
+                            //? if >=1.21.11 {
                             Set.of(STAMPER.get())));
+                            //?} else {
+                            /*// 1.21.1 still takes the datafixer Type as a third argument. null is
+                            // what a mod passes — only vanilla block entities have a registered
+                            // schema — and the parameter was dropped from the constructor later.
+                            Set.of(STAMPER.get()), null));
+                            *///?}
 
     /**
      * Vanilla's {@code MenuType} constructor is private; NeoForge patches it public and wraps it in

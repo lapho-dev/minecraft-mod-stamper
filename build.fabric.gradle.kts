@@ -12,6 +12,12 @@ val modName: String = sc.properties["mod.name"]
 val modVersion: String = sc.properties["mod.version"]
 val mcCompat: String = sc.properties["mod.mc_compat"]
 
+// Fabric API renamed modules across the 26 renumbering: `fabric-item-group-api-v1` became
+// `fabric-creative-tab-api-v1`. Diffed between each target's own API pom on 2026-08-29, not
+// recalled. The manifest has to agree with this, so it is templated in from the same value.
+val creativeTabModule: String =
+    if (sc.current.parsed >= "26.2") "fabric-creative-tab-api-v1" else "fabric-item-group-api-v1"
+
 val requiredJava: JavaVersion = when {
     sc.current.parsed >= "26.1" -> JavaVersion.VERSION_25
     sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
@@ -60,7 +66,7 @@ dependencies {
     //                           as well as its own; a module's ordinary access widener does not.
     for (module in listOf(
         "fabric-registry-sync-v0",
-        "fabric-item-group-api-v1",
+        creativeTabModule,
         "fabric-object-builder-api-v1",
         "fabric-transitive-access-wideners-v1",
     )) {
@@ -108,6 +114,23 @@ tasks {
         useJUnitPlatform()
     }
 
+    // Stonecutter's per-version overlay (versions/<node>/src/main/resources) replaces the file at
+    // the same path under the shared src/ — but it only *excludes* the shared copy by itself on
+    // nodes that are not the active one. On the active node both directories sit on the source set,
+    // the overridden file appears twice, and Gradle refuses to guess. EXCLUDE keeps the first, and
+    // the node's own directory is registered ahead of the shared root, so the overlay wins.
+    // Verified by unzipping the built jar and reading the file back, not assumed.
+    // Scoped to these two task types on purpose. Stonecutter's own generate task copies the raw
+    // shared source and the preprocessed copy into one directory and relies on INCLUDE so the
+    // processed file lands last and wins; widening this to every AbstractCopyTask overwrites that
+    // and silently compiles unprocessed source on every non-active node.
+    withType<ProcessResources>().configureEach {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+    withType<Jar>().configureEach {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
     withType<ProcessResources>().configureEach {
         // Materialise the values into a plain map here. Referencing the script's own properties
         // from inside the filesMatching action captures a script object reference, which the
@@ -117,6 +140,7 @@ tasks {
             "name" to modName,
             "version" to modVersion,
             "minecraft" to mcCompat,
+            "creative_tab_module" to creativeTabModule,
         )
         inputs.properties(props)
 

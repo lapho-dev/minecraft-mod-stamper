@@ -12,6 +12,21 @@ deps.fabric_loader = "0.19.3"
 # Pinned to a release rather than the 1.17-SNAPSHOT line, so builds are reproducible.
 loomx.loom_version = "1.17.20"
 
+["1.21.1"]
+mod.mc_releases = ["1.21.1"]
+
+[fabric."1.21.1"]
+mod.mc_compat = "1.21.1"
+# Newest release build for this Minecraft version (Modrinth, 2026-08-29). All four modules the
+# Fabric build takes (D21, D27) exist on this line — checked against the API pom, not assumed.
+deps.fabric_api = "0.116.15+1.21.1"
+
+[neoforge."1.21.1"]
+mod.mc_compat = "[1.21.1]"
+# Newest 21.1.x on maven.neoforged.net (2026-08-29).
+deps.neo_loader = "21.1.249"
+deps.neo_range = "[21.1,21.2)"
+
 ["1.21.11"]
 mod.mc_releases = ["1.21.11"]
 
@@ -25,3 +40,20 @@ deps.fabric_api = "0.141.6+1.21.11"
 mod.mc_compat = "[1.21.11]"
 # Newest 21.11.x on maven.neoforged.net, and the first non-beta line for this MC version.
 deps.neo_loader = "21.11.45"
+# The range the mod declares it runs on. Left as it shipped in v1.0.0 rather than tightened during
+# a port; 26.x sorts above it, but `mod.mc_compat` already pins the Minecraft version.
+deps.neo_range = "[21.11,)"
+
+["26.2"]
+mod.mc_releases = ["26.2"]
+
+[fabric."26.2"]
+mod.mc_compat = "26.2"
+# Newest release build for this Minecraft version (Modrinth, 2026-08-29).
+deps.fabric_api = "0.158.0+26.2"
+
+[neoforge."26.2"]
+mod.mc_compat = "[26.2]"
+# Newest 26.2.x on maven.neoforged.net (2026-08-29).
+deps.neo_loader = "26.2.0.72"
+deps.neo_range = "[26.2,26.3)"

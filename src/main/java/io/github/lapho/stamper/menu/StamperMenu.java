@@ -45,7 +45,7 @@ public class StamperMenu extends AbstractContainerMenu {
     private static final int HOTBAR_END = 39;
 
     // Slot positions, in GUI-sheet pixels. These are the vanilla anvil's, which is what the
-    // placeholder sheet was drawn around — docs/ART.md records them, and they were re-read off
+    // placeholder sheet was drawn around â docs/ART.md records them, and they were re-read off
     // assets/stamper/textures/gui/container/stamper.png rather than trusted.
     private static final int TEMPLATE_X = 27;
     private static final int INPUT_X = 76;
@@ -70,7 +70,7 @@ public class StamperMenu extends AbstractContainerMenu {
     /**
      * Client-side constructor, called by the {@link MenuType} when the server opens the screen.
      * The real contents arrive from the server as slot updates, so a throwaway container of the
-     * right size is all that is needed here — the same thing vanilla's {@code DispenserMenu} does.
+     * right size is all that is needed here â the same thing vanilla's {@code DispenserMenu} does.
      */
     public StamperMenu(MenuType<?> type, int containerId, Inventory playerInventory) {
         this(type, containerId, playerInventory, new SimpleContainer(STAMPER_SLOT_COUNT));
@@ -90,7 +90,22 @@ public class StamperMenu extends AbstractContainerMenu {
         addSlot(new TemplateSlot(stamper, SLOT_TEMPLATE, TEMPLATE_X, SLOT_ROW_Y));
         addSlot(new Slot(stamper, SLOT_INPUT, INPUT_X, SLOT_ROW_Y));
         addSlot(new GhostResultSlot(preview, 0, RESULT_X, SLOT_ROW_Y));
+        //? if >=1.21.11 {
         addStandardInventorySlots(playerInventory, PLAYER_INVENTORY_X, PLAYER_INVENTORY_Y);
+        //?} else {
+        /*// No addStandardInventorySlots before 1.21.2. Transcribed from the 1.21.11 bytecode of
+        // addInventoryExtendedSlots + addInventoryHotbarSlots so the slot indices and positions
+        // are identical, not merely similar — shift-click order (D28) depends on that order.
+        for (int row = 0; row < 3; ++row) {
+            for (int col = 0; col < 9; ++col) {
+                addSlot(new Slot(playerInventory, col + (row + 1) * 9,
+                        PLAYER_INVENTORY_X + col * 18, PLAYER_INVENTORY_Y + row * 18));
+            }
+        }
+        for (int col = 0; col < 9; ++col) {
+            addSlot(new Slot(playerInventory, col, PLAYER_INVENTORY_X + col * 18, PLAYER_INVENTORY_Y + 58));
+        }
+        *///?}
 
         // The first sync to the client happens when the menu is opened, before any tick runs, so
         // the preview has to be right by the time this constructor returns or the player sees an
@@ -125,7 +140,7 @@ public class StamperMenu extends AbstractContainerMenu {
 
         lastTemplate = template.copy();
         lastInput = input.copy();
-        // The same call the block makes on a pulse (SPEC §6), so the preview cannot drift from the
+        // The same call the block makes on a pulse (SPEC Â§6), so the preview cannot drift from the
         // behaviour. An empty input gives ItemStack.EMPTY, which renders as an empty result slot.
         preview.setItem(0, StampOperation.apply(template, input));
     }
@@ -136,7 +151,7 @@ public class StamperMenu extends AbstractContainerMenu {
      *
      * <p>That order is deliberate and is the opposite of the anvil's left-to-right fill. Filling
      * the template first would mean a player shift-clicking a stack into an empty Stamper silently
-     * arms it to stamp <i>those items' name</i> onto everything that follows afterwards — SPEC
+     * arms it to stamp <i>those items' name</i> onto everything that follows afterwards â SPEC
      * &sect;11's footgun, reached by accident. The input slot is the stream; the template is set
      * once, on purpose, by hand.
      */
@@ -148,8 +163,8 @@ public class StamperMenu extends AbstractContainerMenu {
         }
 
         // Unreachable: doClick refuses QUICK_MOVE on a slot that cannot be picked up, so the ghost
-        // never gets here. Kept because the alternative — moveItemStackTo over a range that
-        // contains slot 2 — would happily merge into the ghost, and this is the file where that
+        // never gets here. Kept because the alternative â moveItemStackTo over a range that
+        // contains slot 2 â would happily merge into the ghost, and this is the file where that
         // mistake would get made.
         if (index == SLOT_RESULT) {
             return ItemStack.EMPTY;

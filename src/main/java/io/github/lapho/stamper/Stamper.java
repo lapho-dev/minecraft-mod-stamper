@@ -10,9 +10,12 @@ import net.minecraft.resources.Identifier;
  * The build side has its own single declaration, {@code mod.id} in
  * {@code stonecutter.properties.toml}, which is what fills in the loader manifests.
  *
- * <p>Note for porters: 1.21.11 renamed {@code ResourceLocation} to {@code Identifier} in Mojang
- * mappings. The source in git is stored in the 1.21.11 state; Stonecutter rewrites it for older
- * targets. See docs/VERSIONING.md.
+ * <p><b>Note for porters:</b> the id class below is spelled differently before and after 1.21.11,
+ * because Mojang mappings renamed it there. Source in git is stored in the 1.21.11 state and
+ * Stonecutter rewrites it for older targets. <b>Do not write both spellings into a sentence here:</b>
+ * the rewrite is a plain string replacement and applies to prose as well as code, so a sentence
+ * naming both survives exactly one switch before it reads as the same word twice. That is why this
+ * paragraph names neither. See docs/VERSIONING.md and D52.
  */
 public final class Stamper {
     /** See docs/SPEC.md &sect;1. */

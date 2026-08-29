@@ -29,7 +29,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+//? if >=1.21.11 {
 import net.minecraft.world.level.redstone.Orientation;
+//?}
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -182,8 +184,13 @@ public class StamperBlock extends Block implements EntityBlock {
      * the block above power this one.
      */
     @Override
+    //? if >=1.21.11 {
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock,
                                    @Nullable Orientation orientation, boolean movedByPiston) {
+    //?} else {
+    /*protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock,
+                                   BlockPos neighborPos, boolean movedByPiston) {
+    *///?}
         boolean powered = level.hasNeighborSignal(pos) || level.hasNeighborSignal(pos.above());
         boolean triggered = state.getValue(TRIGGERED);
         if (powered && !triggered) {
@@ -262,7 +269,11 @@ public class StamperBlock extends Block implements EntityBlock {
     }
 
     @Override
+    //? if >=1.21.11 {
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+    //?} else {
+    /*protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    *///?}
         // Reads slot 0 only — the block entity owns that rule (SPEC §8, D3).
         return level.getBlockEntity(pos) instanceof StamperBlockEntity stamper ? stamper.comparatorOutput() : 0;
     }
@@ -280,20 +291,34 @@ public class StamperBlock extends Block implements EntityBlock {
      * {@code level.getBlockEntity(pos)} is already null. Any drop code written inside such a guard
      * is dead, and this method previously contained exactly that.
      *
-     * <p><b>Port hazard.</b> That ordering is what satisfies SPEC &sect;11 here. Older
-     * targets have no {@code preRemoveSideEffects}, so on 1.21.1 the drop must be performed by
-     * hand in {@code onRemove}. Do not read this file as evidence that the mod drops its own
-     * contents &mdash; it does not.
+     * <p><b>Port hazard, and how the 1.21.1 branch below answers it.</b> That ordering is what
+     * satisfies SPEC &sect;11 here. 1.21.1 has no {@code preRemoveSideEffects} and removes the block
+     * entity <i>after</i> {@code onRemove}, so the drop happens there instead &mdash; still not by
+     * hand, because {@code Containers.dropContentsOnDestroy} is vanilla's own helper and is what
+     * {@code DropperBlock} calls on that version. Do not read this file as evidence that the mod
+     * drops its own contents &mdash; on neither target does it.
      *
      * <p>The comparator refresh is unconditional and outside any block-entity lookup, matching
      * {@code DispenserBlock}. It has to be: it is precisely the call that must still happen once
      * the block entity is gone, and burying it in the dead guard meant a comparator reading the
      * &sect;8 signal <i>through</i> a solid block kept a stale value after the Stamper was broken.
      */
+    //? if >=1.21.11 {
     @Override
     protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
         Containers.updateNeighboursAfterDestroy(state, level, pos);
     }
+    //?} else {
+    /*@Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        // Drops slots 0 and 1 *and* refreshes comparators, both inside vanilla's helper. That
+        // second half is G28: a comparator reading the signal through a solid block must not keep
+        // a stale value once the Stamper is gone. Read out of the 1.21.1 bytecode of this helper
+        // and of DropperBlock, not recalled (D33).
+        Containers.dropContentsOnDestroy(state, newState, level, pos);
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+    *///?}
 
     // --- Rotation and mirroring -----------------------------------------------------------------
 

@@ -1,7 +1,11 @@
 package io.github.lapho.stamper.core;
 
 import net.minecraft.SharedConstants;
-import net.minecraft.core.component.DataComponentType;
+//? if >=26.2 {
+/*import net.minecraft.core.component.DataComponentInitializers;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.registries.VanillaRegistries;
+*///?}
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -34,6 +38,21 @@ class StampOperationTest {
         SharedConstants.tryDetectVersion();
         // Guarded internally by an isBootstrapped flag, so repeat calls are harmless.
         Bootstrap.bootStrap();
+        //? if >=26.2 {
+        /*// 26.2 stopped binding item components during bootstrap: they are built against a
+        // registry lookup and applied as a separate pass. Without this every `new ItemStack(...)`
+        // throws "Components not bound yet", which reads as a broken test rather than a missing
+        // setup step.
+        //
+        // Guarded on whether they are already bound rather than on the loader. NeoForge runs these
+        // tests inside a real FML environment, which has bound them already, and running the pass
+        // a second time there trips NeoForge's own component validator on a vanilla class. Fabric
+        // runs them in a bare JVM, where nothing has. One test, no loader branch.
+        if (!Items.STONE.builtInRegistryHolder().areComponentsBound()) {
+            BuiltInRegistries.DATA_COMPONENT_INITIALIZERS.build(VanillaRegistries.createLookup())
+                    .forEach(DataComponentInitializers.PendingComponents::apply);
+        }
+        *///?}
     }
 
     // --- helpers -------------------------------------------------------------------------------
@@ -47,21 +66,26 @@ class StampOperationTest {
         return stack.get(DataComponents.CUSTOM_NAME);
     }
 
-    // --- U1-U5: the SPEC section 6 truth table, row for row ------------------------------------
+    // The plain stackable item used throughout is Items.STONE rather than a dyed one. 26.2 folded the
+// dyed variants into colour collections — Items.WHITE_CARPET no longer exists, it is reached
+// through Items.CARPET — and nothing here depends on which ordinary item it is, so the tests stay
+// one set across all six targets instead of gaining a version branch.
+
+// --- U1-U5: the SPEC section 6 truth table, row for row ------------------------------------
 
     @Test
     @DisplayName("U1: empty template, plain input -> unchanged, still no custom name")
     void u1() {
-        ItemStack out = StampOperation.apply(ItemStack.EMPTY, new ItemStack(Items.WHITE_CARPET));
+        ItemStack out = StampOperation.apply(ItemStack.EMPTY, new ItemStack(Items.STONE));
 
-        assertEquals(Items.WHITE_CARPET, out.getItem());
+        assertEquals(Items.STONE, out.getItem());
         assertNull(customNameOf(out), "a plain input must not gain a name");
     }
 
     @Test
     @DisplayName("U2: empty template strips an existing custom name")
     void u2() {
-        ItemStack input = named(new ItemStack(Items.WHITE_CARPET), "hello");
+        ItemStack input = named(new ItemStack(Items.STONE), "hello");
 
         ItemStack out = StampOperation.apply(ItemStack.EMPTY, input);
 
@@ -73,7 +97,7 @@ class StampOperationTest {
     void u3() {
         ItemStack out = StampOperation.apply(
                 new ItemStack(Items.CHEST),
-                named(new ItemStack(Items.WHITE_CARPET), "hello"));
+                named(new ItemStack(Items.STONE), "hello"));
 
         assertEquals(new ItemStack(Items.CHEST).getHoverName(), customNameOf(out));
     }
@@ -83,7 +107,7 @@ class StampOperationTest {
     void u4() {
         ItemStack out = StampOperation.apply(
                 named(new ItemStack(Items.CHEST), "bye"),
-                named(new ItemStack(Items.WHITE_CARPET), "hello"));
+                named(new ItemStack(Items.STONE), "hello"));
 
         assertEquals("bye", customNameOf(out).getString());
     }
@@ -93,7 +117,7 @@ class StampOperationTest {
     void u5() {
         ItemStack out = StampOperation.apply(
                 named(new ItemStack(Items.CHEST), "bye"),
-                new ItemStack(Items.WHITE_CARPET));
+                new ItemStack(Items.STONE));
 
         assertEquals("bye", customNameOf(out).getString());
     }
@@ -113,9 +137,14 @@ class StampOperationTest {
 
         // Asserted generically rather than component by component: the guarantee is that the
         // operation touches nothing else, including components a future version might add.
+        // Written as "equal once the names are equalised" rather than with
+        // ItemStack.matchesIgnoringComponents, which does not exist before 1.21.11. The claim is
+        // the same and this form holds on every target, so the test stays one test rather than
+        // two branches — worth it for the assertion that guards the core rule.
+        ItemStack expected = input.copy();
+        expected.set(DataComponents.CUSTOM_NAME, out.get(DataComponents.CUSTOM_NAME));
         assertTrue(
-                ItemStack.matchesIgnoringComponents(input, out,
-                        (DataComponentType<?> type) -> type == DataComponents.CUSTOM_NAME),
+                ItemStack.matches(expected, out),
                 "only custom_name may differ between input and output");
         assertEquals(37, out.getDamageValue());
         assertEquals(9, out.get(DataComponents.REPAIR_COST));
@@ -127,7 +156,7 @@ class StampOperationTest {
     void u7() {
         ItemStack out = StampOperation.apply(
                 new ItemStack(Items.CHEST),
-                new ItemStack(Items.WHITE_CARPET));
+                new ItemStack(Items.STONE));
 
         assertInstanceOf(TranslatableContents.class, customNameOf(out).getContents(),
                 "flattening to a literal would break every non-English client (SPEC section 6)");
@@ -139,7 +168,7 @@ class StampOperationTest {
         ItemStack template = named(new ItemStack(Items.CHEST), "bye");
         ItemStack before = template.copy();
 
-        StampOperation.apply(template, named(new ItemStack(Items.WHITE_CARPET), "hello"));
+        StampOperation.apply(template, named(new ItemStack(Items.STONE), "hello"));
 
         assertTrue(ItemStack.matches(before, template),
                 "slot 0 is a reusable die and must come out byte-identical (D3)");
@@ -150,7 +179,7 @@ class StampOperationTest {
     void u9() {
         ItemStack template = named(new ItemStack(Items.CHEST), "bye");
 
-        ItemStack out = StampOperation.apply(template, new ItemStack(Items.WHITE_CARPET));
+        ItemStack out = StampOperation.apply(template, new ItemStack(Items.STONE));
         // Rename the template the way an anvil would, after the stamp has already happened.
         named(template, "changed");
 
@@ -161,7 +190,7 @@ class StampOperationTest {
     @Test
     @DisplayName("U10: exactly one item is produced; the caller owns the decrement")
     void u10() {
-        ItemStack input = new ItemStack(Items.WHITE_CARPET, 64);
+        ItemStack input = new ItemStack(Items.STONE, 64);
 
         ItemStack out = StampOperation.apply(named(new ItemStack(Items.CHEST), "bye"), input);
 
@@ -175,7 +204,7 @@ class StampOperationTest {
         ItemStack template = new ItemStack(Items.CHEST);
         template.set(DataComponents.ITEM_NAME, Component.literal("Crate"));
 
-        ItemStack out = StampOperation.apply(template, new ItemStack(Items.WHITE_CARPET));
+        ItemStack out = StampOperation.apply(template, new ItemStack(Items.STONE));
 
         assertEquals("Crate", customNameOf(out).getString(),
                 "getHoverName() falls through custom_name to item_name");

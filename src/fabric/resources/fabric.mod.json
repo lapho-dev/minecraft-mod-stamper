@@ -22,7 +22,7 @@
     "fabricloader": ">=0.19",
     "minecraft": "${minecraft}",
     "fabric-registry-sync-v0": "*",
-    "fabric-item-group-api-v1": "*",
+    "${creative_tab_module}": "*",
     "fabric-object-builder-api-v1": "*",
     "fabric-transitive-access-wideners-v1": "*"
   }

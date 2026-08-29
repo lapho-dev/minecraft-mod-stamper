@@ -6,8 +6,10 @@ build/
 
 # Stonecutter
 /versions/*/build/
-/versions/*/src/
 .stonecutter/
+# NOT ignored: /versions/*/src/ is the per-version resource overlay (a file there replaces the
+# one at the same path under the shared src/), and it is hand-written source that must be
+# committed. Stonecutter's own generated output goes to build/, which is covered above.
 
 # Loom / NeoGradle / dev runs
 run/

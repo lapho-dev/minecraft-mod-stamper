@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "A": { "item": "minecraft:anvil" },
+    "D": { "item": "minecraft:dropper" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "P": { "item": "minecraft:paper" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "pattern": [
+    "IPI",
+    "IAI",
+    "RDR"
+  ],
+  "result": {
+    "count": 1,
+    "id": "stamper:stamper"
+  }
+}

@@ -79,14 +79,20 @@ public final class StamperContent {
                 .mapColor(MapColor.STONE)
                 .strength(1.5F, 3.5F)
                 .requiresCorrectToolForDrops()
-                .setId(STAMPER_BLOCK), blockEntityType, menuType);
+                //? if >=1.21.11 {
+                .setId(STAMPER_BLOCK)
+                //?}
+                , blockEntityType, menuType);
     }
 
     /** {@code useBlockDescriptionPrefix} makes the item reuse the block's translation key. */
     public static BlockItem createStamperItem(Block block) {
         return new BlockItem(block, new Item.Properties()
+                //? if >=1.21.11 {
                 .useBlockDescriptionPrefix()
-                .setId(STAMPER_ITEM));
+                .setId(STAMPER_ITEM)
+                //?}
+                );
     }
 
     /**

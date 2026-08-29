@@ -8,10 +8,13 @@ license = "MIT"
 
 # Jar-root-relative, and NeoForge splits path separators before handing it to
 # PackResources.getRootResource, so a nested path resolves (ModListScreen). One file serves both
-# loaders; Fabric points at the same path from fabric.mod.json. logoBlur=false keeps NEAREST
-# filtering, which is what pixel art wants (D48).
-logoFile = "assets/${id}/icon.png"
-logoBlur = false
+# loaders; Fabric points at the same path from fabric.mod.json. Blur off keeps NEAREST filtering,
+# which is what pixel art wants (D48).
+#
+# The key names are filled in per target: `logoFile`/`logoBlur` up to 1.21.11, `iconFile`/`iconBlur`
+# from 26.2, which deprecated the old pair. See build.neoforge.gradle.kts and D55.
+${icon_key} = "assets/${id}/icon.png"
+${icon_blur_key} = false
 
 [[mods]]
 modId = "${id}"
@@ -33,6 +36,6 @@ side = "BOTH"
 [[dependencies.${id}]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.11,)"
+versionRange = "${neoforge}"
 ordering = "NONE"
 side = "BOTH"

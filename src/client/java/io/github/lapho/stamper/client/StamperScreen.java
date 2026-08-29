@@ -2,9 +2,15 @@ package io.github.lapho.stamper.client;
 
 import io.github.lapho.stamper.Stamper;
 import io.github.lapho.stamper.menu.StamperMenu;
+//? if >=26.2 {
+/*import net.minecraft.client.gui.GuiGraphicsExtractor;
+*///?} else {
 import net.minecraft.client.gui.GuiGraphics;
+//?}
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+//? if >=1.21.11 {
 import net.minecraft.client.renderer.RenderPipelines;
+//?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
@@ -21,13 +27,21 @@ import net.minecraft.world.entity.player.Inventory;
  * <p>There is no XP bar, no level cost and no "too expensive" text, because this is not an anvil
  * (SPEC &sect;10). The only reason it looks like one is the slot layout.
  *
- * <p><b>Porters:</b> docs/VERSIONING.md ranks this file as the churniest in the mod. In 1.21.11
- * the background draw is
- * {@code blit(RenderPipeline, Identifier, x, y, u, v, w, h, texW, texH)} and the base
- * {@code render} does <i>not</i> draw slot tooltips, so this class calls
- * {@code renderTooltip} itself &mdash; both read off {@code DispenserScreen} in this version's
- * sources, and both have moved before. Verify them against the target, do not port either from
- * memory.
+ * <p><b>Porters:</b> docs/VERSIONING.md ranks this file as the churniest in the mod, and it has
+ * earned that on all three targets. Each branch below was read off {@code DispenserScreen} in that
+ * version's own sources, never carried over:
+ *
+ * <ul>
+ *   <li><b>1.21.1</b> &mdash; {@code blit} takes no render pipeline.</li>
+ *   <li><b>1.21.11</b> &mdash; {@code blit(RenderPipeline, Identifier, &hellip;)}, and the base
+ *       {@code render} does <i>not</i> draw slot tooltips, so this class calls
+ *       {@code renderTooltip} itself.</li>
+ *   <li><b>26.2</b> &mdash; the GUI moved to extraction: {@code GuiGraphics} is gone,
+ *       {@code renderBg} became {@code Screen.extractBackground(GuiGraphicsExtractor, &hellip;)},
+ *       and {@code AbstractContainerScreen.extractRenderState} calls {@code extractTooltip} for
+ *       us, so the tooltip override disappears entirely. Dropping it is not an oversight &mdash;
+ *       keeping it would double-draw.</li>
+ * </ul>
  */
 public class StamperScreen extends AbstractContainerScreen<StamperMenu> {
     /** docs/ART.md: a 256x256 sheet with the usual 176x166 panel at the origin. */
@@ -46,6 +60,17 @@ public class StamperScreen extends AbstractContainerScreen<StamperMenu> {
         titleLabelX = (imageWidth - font.width(title)) / 2;
     }
 
+    // The three branches are kept flat and whole rather than nested, because a commented-out
+    // branch must not contain a block comment: the first `*/` inside it would end the comment
+    // early. docs/VERSIONING.md, and D50.
+
+    //? if >=26.2 {
+    /*@Override
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, leftPos, topPos, 0.0F, 0.0F,
+                imageWidth, imageHeight, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+    *///?} elif >=1.21.11 {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
@@ -59,4 +84,20 @@ public class StamperScreen extends AbstractContainerScreen<StamperMenu> {
         graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, leftPos, topPos, 0.0F, 0.0F,
                 imageWidth, imageHeight, TEXTURE_SIZE, TEXTURE_SIZE);
     }
+    //?} else {
+    /*@Override
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.render(graphics, mouseX, mouseY, partialTick);
+        // SPEC §10, as above: 1.21.1's base render does not draw slot tooltips either.
+        renderTooltip(graphics, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+        // Same overload minus the render pipeline, which 1.21.1 has no concept of. The argument
+        // list is otherwise identical, including the float u/v.
+        graphics.blit(BACKGROUND, leftPos, topPos, 0.0F, 0.0F,
+                imageWidth, imageHeight, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+    *///?}
 }

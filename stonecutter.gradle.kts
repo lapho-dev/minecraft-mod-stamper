@@ -30,5 +30,13 @@ stonecutter parameters {
         string(current.parsed >= "1.21.11") {
             replace("ResourceLocation", "Identifier")
         }
+
+        // Mojang ships `org.jspecify:jspecify` as a Minecraft library on 1.21.11 and did not on
+        // 1.21.1 — checked against each target's own library list, not assumed. Only the import
+        // line differs; every `@Nullable` use site is spelled the same either way, which is why
+        // this is a replacement rather than a directive in five files.
+        string(current.parsed >= "1.21.11") {
+            replace("org.jetbrains.annotations.Nullable", "org.jspecify.annotations.Nullable")
+        }
     }
 }

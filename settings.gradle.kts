@@ -27,12 +27,11 @@ stonecutter {
             for (loader in loaders) version("$project-$loader", version).buildscript("build.$loader.gradle.kts")
         }
 
-        // The reference target only. Ports add their own entries here, one target at a time
-        // (docs/TODO.md task 5).
-        // Ports add these, one target at a time, only after the reference build is tagged:
-        //     match("1.21.1", "fabric", "neoforge")
-        //     match("26.2.x", "fabric", "neoforge", version = "26.2")
+        // Registered targets. One version is added at a time, and only once the previous one is
+        // green on both loaders (docs/TODO.md task 5).
+        match("1.21.1", "fabric", "neoforge")
         match("1.21.11", "fabric", "neoforge")
+        match("26.2", "fabric", "neoforge")
 
         // The code state committed to git. 1.21.11 is the reference version (D11).
         vcsVersion = "1.21.11-fabric"

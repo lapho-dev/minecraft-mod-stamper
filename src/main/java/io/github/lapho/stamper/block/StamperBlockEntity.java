@@ -20,8 +20,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+//? if >=1.21.11 {
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+//?} else {
+/*import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+*///?}
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -265,9 +270,14 @@ public class StamperBlockEntity extends BlockEntity implements WorldlyContainer,
     // --- Serialisation --------------------------------------------------------------------------
     //
     // 1.21.11 uses the ValueInput/ValueOutput abstraction. The early 1.21 line took
-    // (CompoundTag, HolderLookup.Provider) instead, so this is a known port site — see
-    // VERSIONING.md, and do not assume either shape without checking the target.
+    // (CompoundTag, HolderLookup.Provider) instead — both shapes below were read off the
+    // BlockEntity of their own target, not assumed. G26 is the test that catches getting this
+    // wrong, and it compiles cleanly either way, so do not skip it.
+    //
+    // The tag name and the meaning of every field are identical on both, which is the point: a
+    // world saved by one build must load in the other.
 
+    //? if >=1.21.11 {
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
@@ -284,6 +294,24 @@ public class StamperBlockEntity extends BlockEntity implements WorldlyContainer,
         ContainerHelper.saveAllItems(output, items);
         output.putInt(TAG_STAMPING_TICKS, stampingTicks);
     }
+    //?} else {
+    /*@Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        items.clear();
+        ContainerHelper.loadAllItems(tag, items, registries);
+        // See the 1.21.11 branch. getInt returns 0 for an absent key on this version, which is the
+        // same default the other branch asks for explicitly.
+        stampingTicks = tag.getInt(TAG_STAMPING_TICKS);
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        ContainerHelper.saveAllItems(tag, items, registries);
+        tag.putInt(TAG_STAMPING_TICKS, stampingTicks);
+    }
+    *///?}
 
     private static final String TAG_STAMPING_TICKS = "stamping_ticks";
 }

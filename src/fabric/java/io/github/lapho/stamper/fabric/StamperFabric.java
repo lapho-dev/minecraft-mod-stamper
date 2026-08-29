@@ -4,7 +4,11 @@ import io.github.lapho.stamper.block.StamperBlockEntity;
 import io.github.lapho.stamper.menu.StamperMenu;
 import io.github.lapho.stamper.reg.StamperContent;
 import net.fabricmc.api.ModInitializer;
+//? if >=26.2 {
+/*import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+*///?} else {
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+//?}
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -74,7 +78,15 @@ public final class StamperFabric implements ModInitializer {
                 new MenuType<>((containerId, playerInventory) ->
                         new StamperMenu(menuType(), containerId, playerInventory), FeatureFlags.VANILLA_SET)));
 
+        // Fabric API renamed this module and its API for the 26 line: fabric-item-group-api-v1
+        // became fabric-creative-tab-api-v1, ItemGroupEvents became CreativeModeTabEvents, and
+        // modifyEntriesEvent became modifyOutputEvent. Same tab, same single entry.
+        //? if >=26.2 {
+        /*CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS)
+                .register(output -> output.accept(stamperItem));
+        *///?} else {
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS)
                 .register(entries -> entries.accept(stamperItem));
+        //?}
     }
 }

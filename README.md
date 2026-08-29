@@ -1,80 +1,41 @@
 # Stamper
+This mod adds exactly one block to a vanilla Minecraft experience - stamper. Stamper block is used to copy and paste a custom name from one item to another. This provides automation to "naming", which an anvil cannot.
 
-A Minecraft mod that adds one block.
 
-The **Stamper** copies a custom name from a reusable template item onto a stream of other items,
-and dispenses the result on a redstone pulse. It never invents a name — the name has to already
-exist on some item, which means someone already paid for it at an anvil.
+## Description
+The stamper block ejects similarly to a crafter, and the IO is similar to that of a furnace. 
+Slot 0: Extract the name of the item in that slot (both original/custom name)
+Slot 1: The item(s) to be named. It will be named as what's provided in slot 0. If there is no item in slot 0, the item will revert to its original name (erase any custom name).
+Slot 2: A ghost preview of the named item.
 
-Think of it as **a dropper that stamps items on the way out.**
+The template item in slot 0 is never consumed.
 
-## What it does
+### IO
+The top and bottom are dedicated to Slot 0, the stamp template (extracting name). 
+The 3 sides are the input for slot 1.
 
-Three slots, laid out like an anvil with the text field removed:
+The front is where the product ejects. Upon a redstone pulse (just like a crafter), it will drop an item out into space or inventory.
 
-```
-[Template]   [Input]   -->   (Result)
-```
+### Redstone
+The stamper block accepts redstone pulse in the cycle of 8gt.
 
-- **Template** — the item whose name gets copied. Never consumed. Put a chest named "Bye" here.
-- **Input** — the items to be named.
-- **Result** — a preview only. You cannot take it out; it leaves through the front on a redstone
-  pulse.
+A comparator signal can be read out of the stamper block - it reads the inventory of only slot 0 (whether there are templates).
 
-| Template | Input | Out |
-|---|---|---|
-| *(empty)* | carpet named "hello" | carpet, name **stripped** |
-| plain chest | carpet named "hello" | carpet named *"Chest"* |
-| chest named "bye" | carpet named "hello" | carpet named "bye" |
+### Possible Usage
+- Say you want to obtain many stacks of "filter item" in a storage system. You can name just one item "filter", and then use the stamper block to name an infinite amount of items with the name "filter"
+- Erase the name of item(s)
 
-## Automation
+## Author Note
+The Stamper is functionally complete — it does everything it set out to do. Improvements and new features are still very much on the table. The art is functional rather than fancy. If you have thoughts, or would like to help, please let me know.
 
-Faces are specialised, furnace-style. The vertical axis carries the template; the horizontal
-plane carries the items.
+The idea of a "stamper" block originates from vanilla redstone mechanics, where "naming" hasn't been a way for automation. I look forward to this (or being added in vanilla) as it unlocks a whole new level of possibilities, e.g., redstone data storage. An advanced version of this (with prefix/ suffix) might be made in the future.
 
-| Face | Slot | In | Out |
-|---|---|---|---|
-| Top | Template | yes | no |
-| Bottom | Template | yes | yes |
-| 3 horizontal sides | Input | yes | no |
-| Front | — | no | no |
+The work is assisted by Claude.
 
-A redstone pulse stamps one item and sends it out the front — into a container if one is there,
-onto the ground if not. A comparator reads the **template** slot only.
+## Requirements
 
-## Recipe
+- **Fabric** — requires **Fabric API**
+- **NeoForge** — no dependencies
 
-```
-iron   paper    iron
-iron   anvil    iron
-redst. dropper  redst.
-```
 
-## Status
-
-**v1.0.0 — released for Minecraft 1.21.11**, on both **Fabric** and **NeoForge**.
-
-Behaviour matches [docs/SPEC.md](docs/SPEC.md) and the full test plan in
-[docs/TESTING.md](docs/TESTING.md) passes on both loaders.
-
-Ports to **1.21.1** and **26.2** are planned; see [docs/TODO.md](docs/TODO.md). Forge is out of
-scope.
-
-Licensed **MIT**. No runtime dependencies on NeoForge; the Fabric build requires **Fabric API**.
-
-## For contributors
-
-Start with [CLAUDE.md](CLAUDE.md), then:
-
-| Document | What it covers |
-|---|---|
-| [docs/SPEC.md](docs/SPEC.md) | Exact behaviour. The contract. |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layer map, why no Architectury, reuse plan |
-| [docs/VERSIONING.md](docs/VERSIONING.md) | Support matrix and what breaks between versions |
-| [docs/TODO.md](docs/TODO.md) | The only list of outstanding work |
-| [docs/TESTING.md](docs/TESTING.md) | Three-tier test plan |
-| [docs/ART.md](docs/ART.md) | Asset brief |
-| [docs/DECISIONS.md](docs/DECISIONS.md) | Why things are the way they are |
-
-The short version: **the spec is authoritative**, `core/` stays pure, and nobody ports from
-memory.
+Available in 16 languages. Licensed **MIT**.

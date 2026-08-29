@@ -1,0 +1,46 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# Stonecutter
+/versions/*/build/
+/versions/*/src/
+.stonecutter/
+
+# Loom / NeoGradle / dev runs
+run/
+runs/
+/versions/*/run/
+remappedSrc/
+*.log
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local overrides (never commit signing keys or upload tokens)
+local.properties
+*.env
+secrets.properties
+
+# Working notes — kept locally, not part of the published source
+/CLAUDE.md
+/.claude/
+/docs/
+
+# Backup of the pre-release git history (delete once you are happy)
+/.git.bak/
+*.bundle

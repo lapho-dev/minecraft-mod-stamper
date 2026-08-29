@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "Copies a custom name from a reusable template item onto a stream of other items and dispenses them on a redstone pulse. A dropper that stamps items on the way out.",
+  "license": "MIT",
+  "icon": "assets/${id}/icon.png",
+  "authors": [
+    "lapho"
+  ],
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.lapho.stamper.fabric.StamperFabric"
+    ],
+    "client": [
+      "io.github.lapho.stamper.fabric.StamperFabricClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19",
+    "minecraft": "${minecraft}",
+    "fabric-registry-sync-v0": "*",
+    "fabric-item-group-api-v1": "*",
+    "fabric-object-builder-api-v1": "*",
+    "fabric-transitive-access-wideners-v1": "*"
+  }
+}

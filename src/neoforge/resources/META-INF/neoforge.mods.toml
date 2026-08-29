@@ -1,0 +1,38 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+
+# SPDX identifier. MIT, decided in D40; SPEC's OPEN-2 is closed. The same id must appear in
+# src/fabric/resources/fabric.mod.json, in the LICENSE file at the repo root, and on the
+# CurseForge project itself, which demands one at project creation (TODO task 4).
+license = "MIT"
+
+# Jar-root-relative, and NeoForge splits path separators before handing it to
+# PackResources.getRootResource, so a nested path resolves (ModListScreen). One file serves both
+# loaders; Fabric points at the same path from fabric.mod.json. logoBlur=false keeps NEAREST
+# filtering, which is what pixel art wants (D48).
+logoFile = "assets/${id}/icon.png"
+logoBlur = false
+
+[[mods]]
+modId = "${id}"
+displayName = "${name}"
+version = "${version}"
+authors = "lapho"
+description = '''
+Copies a custom name from a reusable template item onto a stream of other items and dispenses
+them on a redstone pulse. A dropper that stamps items on the way out.
+'''
+
+[[dependencies.${id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.11,)"
+ordering = "NONE"
+side = "BOTH"

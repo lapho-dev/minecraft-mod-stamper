@@ -1,0 +1,7 @@
+{
+  "parent": "stamper:block/stamper",
+  "textures": {
+    "front": "stamper:block/stamper_front_triggered",
+    "top": "stamper:block/stamper_top_triggered"
+  }
+}

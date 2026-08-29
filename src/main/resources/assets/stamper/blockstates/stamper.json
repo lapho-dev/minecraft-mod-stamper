@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,stamping=false": { "model": "stamper:block/stamper" },
+    "facing=north,stamping=true":  { "model": "stamper:block/stamper_stamping" },
+    "facing=east,stamping=false":  { "model": "stamper:block/stamper", "y": 90 },
+    "facing=east,stamping=true":   { "model": "stamper:block/stamper_stamping", "y": 90 },
+    "facing=south,stamping=false": { "model": "stamper:block/stamper", "y": 180 },
+    "facing=south,stamping=true":  { "model": "stamper:block/stamper_stamping", "y": 180 },
+    "facing=west,stamping=false":  { "model": "stamper:block/stamper", "y": 270 },
+    "facing=west,stamping=true":   { "model": "stamper:block/stamper_stamping", "y": 270 }
+  }
+}

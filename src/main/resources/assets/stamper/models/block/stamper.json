@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "front": "stamper:block/stamper_front",
+    "side": "stamper:block/stamper_side",
+    "top": "stamper:block/stamper_top",
+    "bottom": "stamper:block/stamper_bottom"
+  }
+}

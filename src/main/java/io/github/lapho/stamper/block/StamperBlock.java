@@ -46,9 +46,9 @@ import java.util.function.Supplier;
  * for the item stream. The restriction is structural, not cosmetic.
  *
  * <p><b>Piston immunity is not implemented here</b>, deliberately. In Java Edition pistons refuse
- * any block with a block entity, so SPEC &sect;3 says to assert it in a gametest rather than
- * hand-implement it. Writing code for it would be writing code for something the engine already
- * guarantees.
+ * any block with a block entity, so SPEC &sect;3 says to verify it rather than hand-implement it —
+ * by hand, TESTING.md row G23 (D56; there are no gametests, D49). Writing code for it would be
+ * writing code for something the engine already guarantees.
  */
 public class StamperBlock extends Block implements EntityBlock {
     /** SPEC &sect;3: {@code north}/{@code east}/{@code south}/{@code west}, never up or down. */
@@ -178,7 +178,8 @@ public class StamperBlock extends Block implements EntityBlock {
 
     /**
      * Edge-triggered, exactly as dropper and crafter: rising edge schedules, falling edge only
-     * clears the flag. Holding the signal high fires once, not repeatedly (gametest G15).
+     * clears the flag. Holding the signal high fires once, not repeatedly (TESTING.md row G15,
+     * run by hand — there are no gametests, D49).
      *
      * <p>The {@code above()} term mirrors the dropper — it is what lets redstone sitting on top of
      * the block above power this one.

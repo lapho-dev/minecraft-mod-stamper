@@ -17,7 +17,7 @@ The 3 sides are the input for slot 1.
 The front is where the product ejects. Upon a redstone pulse (just like a crafter), it will drop an item out into space or inventory.
 
 ### Redstone
-The stamper block accepts redstone pulse in the cycle of 8gt.
+The stamper block is edge-triggered, like a dropper: each rising edge stamps once, **4 game ticks** later. Holding a lever gives a single stamp, not a stream. After a successful stamp the front and top faces light for **6 ticks**, then clear themselves.
 
 A comparator signal can be read out of the stamper block - it reads the inventory of only slot 0 (whether there are templates).
 

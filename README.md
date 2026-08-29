@@ -34,8 +34,16 @@ The work is assisted by Claude.
 
 ## Requirements
 
+| Minecraft | Loaders | Java |
+|---|---|---|
+| **1.21.1** | Fabric, NeoForge | 21 |
+| **1.21.11** | Fabric, NeoForge | 21 |
+| **26.2** | Fabric, NeoForge | 25 |
+
 - **Fabric** — requires **Fabric API**
 - **NeoForge** — no dependencies
+
+Behaviour is identical on every version; pick the file matching your Minecraft version and loader.
 
 
 Available in 16 languages. Licensed **MIT**.
